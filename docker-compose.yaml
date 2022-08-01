@@ -1,0 +1,30 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: warden
+      MYSQL_USER: warden
+      MYSQL_PASSWORD: example
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./scripts/warden-mysql.sql:/docker-entrypoint-initdb.d/warden-mysql.sql
+    ports:
+      - 127.0.0.1::3306
+
+  warden:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    volumes:
+      - appdata:/app/data
+      - ./config.json:/etc/warden/config.json
+    ports:
+      - 8080:8080
+
+volumes:
+  mysql:
+  appdata:
